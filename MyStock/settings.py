@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-x*^q_n%e7ltv!)b-sdronzh9c$&7aq*pq=%-@#uf^*ozc%&q57
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api-hidraulica-mp.vercel.app']
+ALLOWED_HOSTS = ['api-hidraulica-mp.vercel.app','api.hidraulicamp.com.ar']
 
 
 # Application definition
@@ -151,3 +151,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS: bool
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_SCHEMA_CLASS' : 'rest_framework.schemas.coreapi.AutoSchema',
+# }
