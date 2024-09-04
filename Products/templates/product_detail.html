@@ -1,0 +1,15 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="product-detail">
+        <div class="product-image">
+            <img src="{{ product.url_img }}" alt="{{ product.name }}">
+        </div>
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            <p>{{ product.description }}</p>
+            <p>Precio: ${{ product.price }}</p>
+            <p>Cantidad en stock: {{ product.count }}</p>
+        </div>
+    </div>
+{% endblock %}

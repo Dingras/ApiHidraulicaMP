@@ -13,7 +13,7 @@ def index(request):
             usuario = authenticate(request, username = request.POST['username'], password=request.POST['password'] )
             if usuario != None:
                 login(request, usuario)
-                return redirect('/admin/')
+                return redirect('products/categories')
             else:
                 return render(request, 'form_login.html', {'form':CustomAuthenticationForm},{'error':'Las datos ingresados son incorrectos.'})
         except:

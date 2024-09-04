@@ -1,0 +1,40 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="products-container">
+        <h1 class="text-center py-4">{{ category.name }}</h1>
+        <div class="btn-group float-right py-2">
+            <a href="../" type="button" class="btn btn-danger">Regresar</a>
+        </div>
+        <table class="table">
+            <thead class="thead-dark">
+                <tr class="text-center">
+                    <th scope="col">#</th>
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr class="text-center">
+                    <th scope="row">{{ product.id }}</th>
+                    <td>
+                        <div class="products-image">
+                            <img src="{{ product.url_img }}" alt="{{ product.name }}" style="height: 5em; width: auto;">
+                        </div>
+                    </td>
+                    <td class="align-middle">{{ product.name }}</td>
+                    <td class="align-middle">
+                        <div class="btn-group">
+                            <a href="./{{product.id}}/" type="button" class="btn btn-success">Ver</a>
+                            <a type="button" class="btn btn-warning">Editar</a>
+                            <a type="button" class="btn btn-danger">Eliminar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}  
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
