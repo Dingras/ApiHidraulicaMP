@@ -27,7 +27,7 @@
                     <td class="align-middle">{{ product.name }}</td>
                     <td class="align-middle">
                         <div class="btn-group">
-                            <a href="./{{product.id}}/" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
+                            <a href="{% url "product" id=product.id %}" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
                             <a type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
                             <a type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                         </div>
