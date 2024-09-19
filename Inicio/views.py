@@ -13,7 +13,7 @@ def index(request):
             usuario = authenticate(request, username = request.POST['username'], password=request.POST['password'] )
             if usuario != None:
                 login(request, usuario)
-                return redirect('products/categories')
+                return redirect('menu')
             else:
                 return render(request, 'form_login.html', {'form':CustomAuthenticationForm},{'error':'Las datos ingresados son incorrectos.'})
         except:
@@ -36,3 +36,7 @@ def register(request):
                 return render(request, 'form_register.html',{'form':CustomUserCreationForm , 'error':'Usuario existente.'})
         else:
             return render(request, 'form_register.html',{'form':CustomUserCreationForm , 'error':'Las contraseñas no coinciden.'})
+
+def users_view(request):
+    data_users = User.objects.order_by('id')
+    return render(request, 'users.html',{'users':data_users})

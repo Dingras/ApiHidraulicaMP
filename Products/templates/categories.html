@@ -4,16 +4,37 @@
     <div class="categories-container w-100">
         <h1 class="text-center py-4">Categorias de productos</h1>
         
-        <div class="d-flex justify-content-center py-2">
+        <div class="d-flex justify-content-between align-items-center py-2">
+            <button id="toggleFormBtn" class="btn btn-info">
+                <i class="bi bi-input-cursor-text">
+                     Mostrar formulario
+                </i>
+            </button>
+            <a href="{% url 'menu' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-return-left">
+                    Regresar
+                </i>
+            </a>
+        </div>
+
+        <div id="form-category-container" class="d-none justify-content-center py-2 mx-auto" style='max-width:600px;'>
             <form method='POST' style="display: flex; flex-wrap:wrap; gap:0.5rem;">
                 {% csrf_token %}
-                    {{ form_category.name }}
-                    {{ form_category.url_img }}
-                <button type="submit" class="btn btn-danger" style="flex:1 0 5rem;">Agregar</button>
+                {{ form_category.name }}
+                {{ form_category.url_img }}
+                {% if 'edit' in request.path %}
+                <button type="submit" class="btn btn-warning" style="flex:1 0 5rem;">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                {% else %}
+                <button type="submit" class="btn btn-success" style="flex:1 0 5rem;">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+                {% endif %}
             </form>
         </div>
         
-        <table class="table w-100">
+        <table class="table w-100 my-2">
             <thead class="thead-dark">
                 <tr class="text-center">
                     <th scope="col">Imagen</th>
@@ -32,9 +53,9 @@
                     <td class="align-middle">{{ category.name }}</td>
                     <td class="align-middle">
                         <div class="btn-group">
-                            <a href="./{{category.id}}/" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                            <a type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                            <a type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            <a href="{% url 'products_ByCategory' category.id %}" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
+                            <a href="{% url 'category_edit' category.id %}" type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'category_delete' category.id %}"type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -42,4 +63,19 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.getElementById('toggleFormBtn').addEventListener('click', function() {
+            var formContainer = document.getElementById('form-category-container');
+            var icon = this.querySelector('i');
+            if (formContainer.classList.contains('d-none')) {
+                formContainer.classList.remove('d-none');
+                icon.textContent = " Ocultar formulario";
+            } else {
+                formContainer.classList.add('d-none');
+                icon.textContent = " Mostrar formulario";
+            }
+        });
+    </script>
+
 {% endblock %}

@@ -3,13 +3,41 @@
 {% block content %}
     <div class="products-container">
         <h1 class="text-center py-4">{{ category.name }}</h1>
-        <div class="btn-group float-right py-2">
-            <a href="../" type="button" class="btn btn-danger">Regresar</a>
+        <div class="d-flex justify-content-between align-items-center py-2">
+            <button id="toggleFormBtn" class="btn btn-info">
+                <i class="bi bi-input-cursor-text">
+                    Mostrar formulario
+                </i>
+            </button>
+            <a href="{% url 'categories' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-return-left">
+                    Regresar
+                </i>
+            </a>
         </div>
-        <table class="table w-100">
+        <div id="form-product-container" class="d-none justify-content-center my-2 py-2 mx-auto" style='max-width:600px;'>
+            <form method='POST' style="display: flex; flex-wrap:wrap; gap:0.5rem;">
+                {% csrf_token %}
+                    {{ form_product.name }}
+                    {{ form_product.description }}
+                    {{ form_product.category }}
+                    {{ form_product.price }}
+                    {{ form_product.count }}
+                    {{ form_product.url_img }}
+                    {% if 'edit' in request.path %}
+                    <button type="submit" class="btn btn-warning" style="flex:1 0 5rem;">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    {% else %}
+                    <button type="submit" class="btn btn-success" style="flex:1 0 5rem;">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                    {% endif %}
+            </form>
+        </div>
+        <table class="table w-100 my-2">
             <thead class="thead-dark">
                 <tr class="text-center">
-                    <th scope="col">#</th>
                     <th scope="col">Imagen</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Opciones</th>
@@ -18,7 +46,6 @@
             <tbody>
                 {% for product in products %}
                 <tr class="text-center">
-                    <th class="align-middle" scope="row">{{ product.id }}</th>
                     <td>
                         <div class="products-image">
                             <img src="{{ product.url_img }}" alt="{{ product.name }}" style="max-width: 5em; max-height: 4em;">
@@ -28,8 +55,8 @@
                     <td class="align-middle">
                         <div class="btn-group">
                             <a href="{% url "product" id=product.id %}" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                            <a type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                            <a type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            <a href="{% url "product_edit" id=product.id %}" type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url "product_delete" id=product.id %}" type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                         </div>
                     </td>
                 </tr>
@@ -37,4 +64,19 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        document.getElementById('toggleFormBtn').addEventListener('click', function() {
+            var formContainer = document.getElementById('form-product-container');
+            var icon = this.querySelector('i');
+            if (formContainer.classList.contains('d-none')) {
+                formContainer.classList.remove('d-none');
+                icon.textContent = " Ocultar formulario";
+            } else {
+                formContainer.classList.add('d-none');
+                icon.textContent = " Mostrar formulario";
+            }
+        });
+    </script>
+
 {% endblock %}
