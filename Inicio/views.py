@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
 from .forms import CustomAuthenticationForm ,CustomUserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
@@ -23,6 +24,7 @@ def salir(request):
     logout(request)
     return redirect('/')
 
+@login_required(login_url='/')
 def register(request):
     if request.method == 'GET':
         return render(request, 'form_register.html',{'form':CustomUserCreationForm})
@@ -37,6 +39,7 @@ def register(request):
         else:
             return render(request, 'form_register.html',{'form':CustomUserCreationForm , 'error':'Las contraseñas no coinciden.'})
 
+@login_required(login_url='/')
 def users_view(request):
     data_users = User.objects.order_by('id')
     return render(request, 'users.html',{'users':data_users})
