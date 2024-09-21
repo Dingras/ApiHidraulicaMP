@@ -14,20 +14,23 @@ def product_detail(request, id):
 def products_view(request, id):
     data_category = get_object_or_404(Category, pk=id)
     data_products = Product.objects.filter(category_id=id)
-    
+    data_error = 'okey'
     if request.method == 'POST':
         form_product = FormProduct(request.POST)
         if form_product.is_valid():
             form_product.save()
             form_product = FormProduct()
             data_products = Product.objects.filter(category_id=id)
+        else:
+            data_error = 'no es valido'
     else:
         form_product = FormProduct()
     
     return render(request, 'products.html', {
         'products': data_products, 
         'category': data_category, 
-        'form_product': form_product
+        'form_product': form_product,
+        'error_data': data_error,
     })
 
 @login_required(login_url='/')
