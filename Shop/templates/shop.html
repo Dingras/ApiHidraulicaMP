@@ -66,7 +66,7 @@
                         </td>
                         <td scope="col">{{ product.name }}</td>
                         <td scope="col">{{ product.count }}</td>
-                        <td scope="col">${{ product.price }}</td>
+                        <td scope="col" class="price-cell">{{ product.price }}</td>
                         <td scope="col">
                             <button class="btn btn-success alertButton" id-product={{ product.id }}>
                                 <i class="bi bi-info-lg"></i>
@@ -82,25 +82,42 @@
 </div>
 
 <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
         const alertButtons = document.querySelectorAll('.alertButton');
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            const priceCells = document.querySelectorAll('.price-cell');
+            priceCells.forEach(cell => {
+                const price = cell.textContent.trim().replace('$', '')
+                console.log(price)
+                cell.innerHTML = formatCurrency(price);
+            });
+        });
+        
+        
         alertButtons.forEach(button => {
             button.addEventListener('click', async function () {
                 // Obtén el id del producto desde el atributo data
                 const idProduct = this.getAttribute('id-product');
     
                 try {
-                    // Realiza la petición a la API
                     const response = await fetch(`https://api.hidraulicamp.com.ar/api/products/${idProduct}`);
                     const product = await response.json();
-    
-                    // Muestra la alerta con los datos del producto
+                    
                     Swal.fire({
                         title: `${product.name}`,
                         imageUrl: `${product.url_img}`,
                         imageHeight: 200,
                         imageAlt: `${product.name}`,
                         html: `
-                            <p>$${product.price}</p>
+                            <p>${formatCurrency(product.price)}</p>
                             <p>${product.description}</p>
                         `,
                         confirmButtonText: 'OK'
