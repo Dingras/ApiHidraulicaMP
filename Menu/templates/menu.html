@@ -2,25 +2,35 @@
 
 {% block content %}
     <div class="menu-container d-flex flex-column align-items-center my-4">
-        <a href="{% url 'categories' %}" class="btn btn-lg btn-block btn-primary mx-2 mb-2" style="max-width: 500px;">
+        <a href="{% url 'categories' %}" class="btn btn-lg btn-block mx-2 mb-2" style="max-width: 500px;background-color: #111827;color: #FFFFFF;">
             <i class="bi bi-box-seam-fill">
                 Productos
             </i>
             <i class="bi bi-box-seam-fill">
             </i>
         </a>
-        <a href="{% url 'services' %}" class="btn btn-lg btn-block btn-secondary mx-2 mb-2" style="max-width: 500px;">
+        <a href="{% url 'services' %}" class="btn btn-lg btn-block mx-2 mb-2" style="max-width: 500px;background-color: #111827;color: #FFFFFF;">
             <i class="bi bi-hammer">
                 Servicios
             </i>
             <i class="bi bi-hammer"></i>
         </a>
-        <a href="{% url 'users' %}" class="btn btn-lg btn-block btn-success mx-2 mb-2" style="max-width: 500px;">
+        <a href="{% url 'users' %}" class="btn btn-lg btn-block mx-2 mb-2" style="max-width: 500px;background-color: #111827;color: #FFFFFF;">
             <i class="bi bi-people-fill">
                 Usuarios
             </i>
             <i class="bi bi-people-fill">
             </i>
         </a>
+        <a href="{% url 'shop' %}" class="btn btn-lg btn-block mx-2 mb-2" style="max-width: 500px;background-color: #111827;color: #FFFFFF;">
+            <i class="bi bi-shop">
+                Tienda
+            </i>
+            <i class="bi bi-cart4">
+            </i>
+        </a>
     </div>
 {% endblock %}
+
+
+

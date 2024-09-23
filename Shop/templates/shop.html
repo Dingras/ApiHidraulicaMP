@@ -1,0 +1,116 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<div class='shop-container row'>
+    
+    <div class='data-cart-container col-md'>
+        <div class='cart-container' style="font-size: clamp(0.3em, 2vw, 1em);"> 
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">$ Unidad</th>
+                        <th scope="col">$ Total</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td scope="col">Imagen</td>
+                        <td scope="col">Nombre</td>
+                        <td scope="col">Cantidad</td>
+                        <td scope="col">$ Unidad</td>
+                        <td scope="col">$ Total</td>
+                        <td scope="col">Opciones</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class='search-products-container col-md col-sm-12'>
+        <div class='search-container my-2'>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Buscar</span>
+                </div>
+                <input type="text" aria-label="Productos" class="form-control">
+            </div>
+        </div>
+        
+        <div class='products-container'> 
+            <table class="table table-dark" style="font-size: clamp(0.3em, 2vw, 1em);">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Imagen</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Cantidad</th>
+                        <th scope="col">$</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for product in products %}
+                    <tr>
+                        <th scope="row">{{product.id}}</th>
+                        <td>
+                            <div class="products-image p-0" style="height: 4em;">
+                                <img src="{{ product.url_img }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: scale-down;">
+                            </div>
+                        </td>
+                        <td scope="col">{{ product.name }}</td>
+                        <td scope="col">{{ product.count }}</td>
+                        <td scope="col">${{ product.price }}</td>
+                        <td scope="col">
+                            <button class="btn btn-primary alertButton" id-product={{ product.id }}>
+                                Mostrar Alerta
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+        const alertButtons = document.querySelectorAll('.alertButton');
+        alertButtons.forEach(button => {
+            button.addEventListener('click', async function () {
+                // Obtén el id del producto desde el atributo data
+                const idProduct = this.getAttribute('id-product');
+    
+                try {
+                    // Realiza la petición a la API
+                    const response = await fetch(`https://api.hidraulicamp.com.ar/api/products/${idProduct}`);
+                    const product = await response.json();
+    
+                    // Muestra la alerta con los datos del producto
+                    Swal.fire({
+                        title: `Producto: ${product.name}`,
+                        text: `ID: ${product.id}, Precio: $${product.price}, Descripción: ${product.description}`,
+                        icon: 'info',
+                        confirmButtonText: 'OK'
+                    });
+                } catch (error) {
+                    console.error('Error al obtener el producto:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo cargar el producto. Inténtalo de nuevo más tarde.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+</script>
+
+{% endblock %}
