@@ -68,8 +68,8 @@
                         <td scope="col">{{ product.count }}</td>
                         <td scope="col">${{ product.price }}</td>
                         <td scope="col">
-                            <button class="btn btn-primary alertButton" id-product={{ product.id }}>
-                                Mostrar Alerta
+                            <button class="btn btn-success alertButton" id-product={{ product.id }}>
+                                <i class="bi bi-info-lg"></i>
                             </button>
                         </td>
                     </tr>
@@ -95,13 +95,17 @@
     
                     // Muestra la alerta con los datos del producto
                     Swal.fire({
-                        title: `Producto: ${product.name}`,
-                        text: `ID: ${product.id}, Precio: $${product.price}, Descripción: ${product.description}`,
-                        icon: 'info',
+                        title: `${product.name}`,
+                        imageUrl: `${product.url_img}`,
+                        imageHeight: 200,
+                        imageAlt: `${product.name}`,
+                        html: `
+                            <p>$${product.price}</p>
+                            <p>${product.description}</p>
+                        `,
                         confirmButtonText: 'OK'
                     });
                 } catch (error) {
-                    console.error('Error al obtener el producto:', error);
                     Swal.fire({
                         title: 'Error',
                         text: 'No se pudo cargar el producto. Inténtalo de nuevo más tarde.',
