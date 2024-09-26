@@ -1,15 +1,22 @@
 {% extends 'index.html' %}
 
 {% block content %}
-
+<div class="d-flex justify-content-end align-items-center py-2">
+        <a href="{% url 'menu' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-return-left">
+                Regresar
+            </i>
+        </a>
+    </div>
 <div class='shop-container row'>
-    
     <div class='data-cart-container col-md'>
+        <div class='card my-2'>
+            <h1 class='text-right mx-2'>$ 200.000,00</h1>
+        </div>
         <div class='cart-container' style="font-size: clamp(0.3em, 2vw, 1em);"> 
-            <table class="table table-dark">
+            <table class="table table-dark text-center align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
                         <th scope="col">Imagen</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Cantidad</th>
@@ -18,16 +25,28 @@
                         <th scope="col">Opciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td scope="col">Imagen</td>
-                        <td scope="col">Nombre</td>
-                        <td scope="col">Cantidad</td>
-                        <td scope="col">$ Unidad</td>
-                        <td scope="col">$ Total</td>
-                        <td scope="col">Opciones</td>
-                    </tr>
+                <tbody id="cart">
+                    {% for item in cart_items %}
+                        <tr class="text-center">
+                            <td scope="col">
+                                <div class="products-image p-0" style="height: 4em;">
+                                    <img src="{{ item.product.url_img }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: scale-down;">
+                                </div>
+                            </td>
+                            <td scope="col">{{ item.product.name }}</td>
+                            <td scope="col" class="quantity">{{ item.quantity }}</td>
+                            <td scope="col" class="price price-cell">{{ item.product.price }}</td>
+                            <td scope="col" class="total price-cell"></td>
+                            <td scope="col">
+                                <form method="post" action="{% url 'remove_to_cart' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-cart-dash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -39,15 +58,14 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Buscar</span>
                 </div>
-                <input type="text" aria-label="Productos" class="form-control">
+                <input type="text" aria-label="Productos" id="searchInput" class="form-control">
             </div>
         </div>
         
         <div class='products-container'> 
-            <table class="table table-dark" style="font-size: clamp(0.3em, 2vw, 1em);">
+            <table class="table table-dark text-center align-middle" id="productsTable" style="font-size: clamp(0.3em, 2vw, 1em);">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
                         <th scope="col">Imagen</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Cantidad</th>
@@ -58,7 +76,6 @@
                 <tbody>
                 {% for product in products %}
                     <tr>
-                        <th scope="row">{{product.id}}</th>
                         <td>
                             <div class="products-image p-0" style="height: 4em;">
                                 <img src="{{ product.url_img }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: scale-down;">
@@ -67,10 +84,16 @@
                         <td scope="col">{{ product.name }}</td>
                         <td scope="col">{{ product.count }}</td>
                         <td scope="col" class="price-cell">{{ product.price }}</td>
-                        <td scope="col">
-                            <button class="btn btn-success alertButton" id-product={{ product.id }}>
+                        <td scope="col" class="btn-group" role="group">
+                            <button class="btn btn-info alertButton m-0" id-product={{ product.id }}>
                                 <i class="bi bi-info-lg"></i>
                             </button>
+                            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success m-0">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
@@ -93,10 +116,20 @@
         const alertButtons = document.querySelectorAll('.alertButton');
         
         document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('#cart tr');
+
+            rows.forEach(row => {
+                const price = parseFloat(row.querySelector('td:nth-child(3)').textContent);
+                const quantity = parseInt(row.querySelector('td:nth-child(4)').textContent);
+                
+                const total = price * quantity;
+                
+                row.querySelector('td:nth-child(5)').textContent = total.toFixed(2);
+            });
+
             const priceCells = document.querySelectorAll('.price-cell');
             priceCells.forEach(cell => {
                 const price = cell.textContent.trim().replace('$', '')
-                console.log(price)
                 cell.innerHTML = formatCurrency(price);
             });
         });
@@ -104,7 +137,6 @@
         
         alertButtons.forEach(button => {
             button.addEventListener('click', async function () {
-                // Obtén el id del producto desde el atributo data
                 const idProduct = this.getAttribute('id-product');
     
                 try {
@@ -129,6 +161,20 @@
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
+                }
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+            const searchValue = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#productsTable tbody tr');
+    
+            rows.forEach(row => {
+                const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                if (productName.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
             });
         });
