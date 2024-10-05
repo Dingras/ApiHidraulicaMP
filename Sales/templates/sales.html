@@ -41,6 +41,7 @@
                             <button class="btn btn-info alertButton m-0" id-sale={{ sale.id }}>
                                 <i class="bi bi-info-lg"></i>
                             </button>
+                            <a href="{% url 'sale_delete' id=sale.id %}" type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                         </td>
                     </tr>
                 {% endfor %}
