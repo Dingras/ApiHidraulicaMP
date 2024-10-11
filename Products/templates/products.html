@@ -55,8 +55,10 @@
                     <td class="align-middle">
                         <div class="btn-group">
                             <a href="{% url "product" id=product.id %}" type="button" class="btn btn-success"><i class="bi bi-eye-fill"></i></a>
-                            <a href="{% url "product_edit" id=product.id %}" type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url "product_delete" id=product.id %}" type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            {% if user.is_staff %}
+                                <a href="{% url "product_edit" id=product.id %}" type="button" class="btn btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url "product_delete" id=product.id %}" type="button" class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>

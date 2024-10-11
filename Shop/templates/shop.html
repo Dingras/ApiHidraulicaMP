@@ -121,15 +121,21 @@
                         <td scope="col">{{ product.name }}</td>
                         <td scope="col">{{ product.count }}</td>
                         <td scope="col" class="price-cell">{{ product.price }}</td>
-                        <td scope="col" class="btn-group" role="group">
-                            <button class="btn btn-info alertButton m-0" id-product={{ product.id }}>
+                        <td scope="col" class="btn-toolbar">
+                            <button class="btn btn-info alertButton" id-product={{ product.id }}>
                                 <i class="bi bi-info-lg"></i>
                             </button>
                             <form method="post" action="{% url 'add_to_cart' product.id %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success m-0">
-                                    <i class="bi bi-cart-plus"></i>
-                                </button>
+                                {% if product.count != 0 %}
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-success" disabled>
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                {% endif %}
                             </form>
                         </td>
                     </tr>
@@ -180,7 +186,8 @@
 
             const priceCells = document.querySelectorAll('.price-cell');
             priceCells.forEach(cell => {
-                const price = cell.textContent.trim().replace('$', '')
+                const priceText = cell.textContent.trim().replace('$', '')
+                let price = parseFloat(priceText);
                 cell.innerHTML = formatCurrency(price);
             });
         });

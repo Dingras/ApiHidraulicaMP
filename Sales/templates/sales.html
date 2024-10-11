@@ -66,7 +66,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             const priceCells = document.querySelectorAll('.price-cell');
             priceCells.forEach(cell => {
-                const price = cell.textContent.trim().replace('$', '')
+                const priceText = cell.textContent.trim().replace('$', '')
+                let price = parseFloat(priceText);  // Convierte el texto en número
                 cell.innerHTML = formatCurrency(price);
             });
         });

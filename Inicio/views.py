@@ -7,6 +7,9 @@ from django.contrib.auth import login, logout, authenticate
 
 # Create your views here.
 def index(request):
+    if request.user.is_authenticated:
+        return redirect('menu')
+    
     if request.method == 'GET':
         return render(request, 'form_login.html', {'form':CustomAuthenticationForm})
     else:
