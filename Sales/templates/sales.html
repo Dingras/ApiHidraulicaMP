@@ -10,18 +10,55 @@
     </a>
 </div>
 <h1 class='text-center'>Ventas</h1>
-<div class='shop-container row'>
-    <div class='search-products-container col-md col-sm-12'>
-        <div class='search-container my-2'>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Buscar</span>
+<div class='sales-container row'>
+    <div class='filter-sales-container col-md col-sm-12'>
+        <div class='filter-container my-2'>
+            <div class="card">
+                <div class="card-body row d-flex align-items-center">
+                    {% comment %} Selector de fechas {% endcomment %}
+                    <div class="col-md-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked onclick="toggleDateInputs()">
+                            <label class="form-check-label" for="exampleRadios1">Por día</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" onclick="toggleDateInputs()">
+                            <label class="form-check-label" for="exampleRadios2">Por rango</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 p-2">
+                        {% comment %} Una fecha {% endcomment %}
+                        <div id="singleDate" style="display: block;">
+                            <label for="fecha">Selecciona una fecha:</label>
+                            <input class="form-control" type="date" id="fecha" name="fecha" required>
+                        </div>
+                        {% comment %} Dos fechas {% endcomment %}
+                        <div id="rangeDate" style="display: none;">
+                            <label for="fechaInicio">Seleccione fecha de inicio:</label>
+                            <input class="form-control" type="date" id="fechaInicio" name="fechaInicio" required>
+                            <label for="fechaFin">Seleccione fecha de finalización:</label>
+                            <input class="form-control" type="date" id="fechaFin" name="fechaFin" required>
+                        </div>
+                    </div>
+                    {% comment %} Vendedor {% endcomment %}
+                    <div class="form-group col-md-5 p-2">
+                        <label for="inputState">Vendedor</label>
+                        <select id="inputState" class="form-control">
+                            <option selected>Todos...</option>
+                            {% for user in users %}
+                                <option>{{ user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% comment %} Boton filtrar {% endcomment %}
+                    <div class="form-group col-md">
+                        <button class="btn btn-block btn-lg btn-secondary" onclick="filterSales()"><i class="bi bi-funnel">Filtrar</i></button>
+                    </div>
                 </div>
-                <input type="text" aria-label="Productos" id="searchInput" class="form-control">
             </div>
         </div>
         
-        <div class='products-container'> 
+        <div class='sales-container'> 
             <table class="table table-dark text-center align-middle" id="productsTable" style="font-size: clamp(0.3em, 2vw, 1em);">
                 <thead>
                     <tr>
@@ -62,6 +99,91 @@
             }).format(amount);
         }
 
+            function toggleDateInputs() {
+                const option1 = document.getElementById('exampleRadios1');
+                const option2 = document.getElementById('exampleRadios2');
+                const singleDateInput = document.getElementById('singleDate');
+                const rangeDateInputs = document.getElementById('rangeDate');
+                const fechaInput = document.getElementById('fecha');
+                const fechaInicioInput = document.getElementById('fechaInicio');
+                const fechaFinInput = document.getElementById('fechaFin');
+        
+                if (option1.checked) {
+                    singleDateInput.style.display = 'block'; // Mostrar fecha única
+                    rangeDateInputs.style.display = 'none'; // Ocultar rango de fechas
+                    fechaInput.value = ''; // Resetear input
+                } else {
+                    singleDateInput.style.display = 'none'; // Ocultar fecha única
+                    rangeDateInputs.style.display = 'block'; // Mostrar rango de fechas
+                    fechaInicioInput.value = ''; // Resetear input de inicio
+                    fechaFinInput.value = ''; // Resetear input de fin
+                }
+            }
+        
+            function parseDateString(dateString) {
+                // Convierte la fecha en el formato "26 Oct. 2024 00:38" a un objeto Date
+                const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+                const date = new Date(dateString.replace(/(\w+)\./, '$1')); // Elimina el punto del mes
+                return date;
+            }
+        
+            function filterSales() {
+                const fecha = document.getElementById('fecha').value;
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+                const selectedVendor = document.getElementById('inputState').value;
+        
+                // Filtrar ventas
+                const salesRows = document.querySelectorAll('tbody tr');
+                salesRows.forEach(row => {
+                    const saleDateString = row.children[1].textContent; // Suponiendo que la fecha está en la segunda celda
+                    const vendor = row.children[0].textContent; // Suponiendo que el vendedor está en la primera celda
+                    
+                    const saleDate = parseDateString(saleDateString); // Convertir la fecha de venta a objeto Date
+        
+                    let showRow = true;
+        
+                    // Filtrar por fecha o rango de fechas
+                    if (document.getElementById('exampleRadios1').checked) {
+                        // Filtrar por día
+                        if (fecha) {
+                            const selectedDate = new Date(fecha + 'T00:00:00');
+                            if (saleDate.toDateString() !== selectedDate.toDateString()) {
+                                showRow = false;
+                            }
+                        }
+                    } else if (document.getElementById('exampleRadios2').checked) {
+                        // Filtrar por rango
+                        if (fechaInicio) {
+                            const startDate = new Date(fechaInicio + 'T00:00:00');
+
+                            if (saleDate < startDate) {
+                                showRow = false;
+                            }
+                        }
+                        if (fechaFin) {
+                            const endDate = new Date(fechaFin + 'T23:59:59.999');
+
+                            if (saleDate > endDate) {
+                                showRow = false;
+                            }
+                        }
+                    }
+        
+                    // Filtrar por vendedor
+                    if (selectedVendor !== 'Todos...' && vendor !== selectedVendor) {
+                        showRow = false;
+                    }
+        
+                    // Mostrar u ocultar la fila según el filtro
+                    row.style.display = showRow ? '' : 'none';
+                });
+            }
+        
+            window.onload = function() {
+                toggleDateInputs(); // Llamar a la función al cargar
+            };
+
         {% comment %} Eventos Carga del DOM {% endcomment %}
         document.addEventListener('DOMContentLoaded', function () {
             const priceCells = document.querySelectorAll('.price-cell');
@@ -71,6 +193,8 @@
                 cell.innerHTML = formatCurrency(price);
             });
         });
+
+
 </script>
 
 {% endblock %}
