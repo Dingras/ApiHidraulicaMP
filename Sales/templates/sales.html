@@ -58,6 +58,18 @@
             </div>
         </div>
         
+        <div class='card'>
+            <div class="card-body row d-flex justify-content-end mx-2">
+                <div class"col">
+                    <h3>Total de ventas filtradas:</h3>
+                </div>
+                <div class"col">
+                    <h3 class="totalSaleFilter">$0.00</h3>
+                </div>
+            </div>
+        </div>
+
+
         <div class='sales-container'> 
             <table class="table table-dark text-center align-middle" id="productsTable" style="font-size: clamp(0.3em, 2vw, 1em);">
                 <thead>
@@ -97,6 +109,28 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             }).format(amount);
+        }
+
+        function calculateTotalSales() {
+            const priceCells = document.querySelectorAll('tbody tr:not([style*="display: none"]) .price-cell');
+            let totalSales = 0;
+
+            priceCells.forEach(cell => {
+                // Convertir el texto a número, eliminando símbolos de moneda y separadores de miles
+                const saleValue = parseFloat(cell.textContent.replace(/[^\d,-]/g, '').replace(',', '.'));
+                if (!isNaN(saleValue)) {
+                    totalSales += saleValue;
+                }
+            });
+
+            // Formatear el total con el símbolo de moneda y separadores
+            const formattedTotal = new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS'
+            }).format(totalSales);
+
+            // Mostrar el total en el elemento con clase totalSaleFilter
+            document.querySelector('.totalSaleFilter').textContent = formattedTotal;
         }
 
             function toggleDateInputs() {
@@ -178,11 +212,16 @@
                     // Mostrar u ocultar la fila según el filtro
                     row.style.display = showRow ? '' : 'none';
                 });
+                calculateTotalSales();
             }
         
             window.onload = function() {
                 toggleDateInputs(); // Llamar a la función al cargar
+                calculateTotalSales()
             };
+
+        
+
 
         {% comment %} Eventos Carga del DOM {% endcomment %}
         document.addEventListener('DOMContentLoaded', function () {
