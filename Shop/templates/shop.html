@@ -240,9 +240,10 @@
             .then(stream => {
                 videoStream = stream;
                 video.srcObject = stream;
-                video.setAttribute("playsinline", true);
-                video.play();
-                requestAnimationFrame(() => scanQRCode(video));
+                video.addEventListener("loadedmetadata", () => {
+                    video.play();
+                    requestAnimationFrame(() => scanQRCode(video));
+                });
             })
             .catch(error => {
                 console.error("Error al acceder a la cámara:", error);
