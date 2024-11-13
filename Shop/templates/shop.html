@@ -244,6 +244,7 @@
                     video.play();
                     requestAnimationFrame(() => scanQRCode(video));
                 });
+                document.getElementById("qrcode-scanner").appendChild(video);
             })
             .catch(error => {
                 console.error("Error al acceder a la cámara:", error);
@@ -281,7 +282,7 @@
     function openScanner() {
         Swal.fire({
             title: 'Escanea el código QR',
-            html: `<div id="barcode-scanner" style="width: 100%; height: 300px;"></div>`,
+            html: `<div id="qrcode-scanner" style="width: 100%; height: 300px;"></div>`,
             showCancelButton: true,
             focusConfirm: false,
             didOpen: () => startQRCodeScanner(),
