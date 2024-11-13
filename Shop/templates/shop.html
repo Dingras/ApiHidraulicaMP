@@ -98,14 +98,14 @@
                 </div>
                 <input type="text" aria-label="Productos" id="searchInput" class="form-control">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-dark" type="button" onclick=openScanner()>
+                    <button class="btn btn-outline-dark" id="scanner-btn" type="button">
                         <i class="bi bi-upc-scan"> Leer </i><i class="bi bi-qr-code-scan"></i>
                     </button>
                 </div>
             </div>
         </div>
         
-        <div id="qrcode-scanner" style="width: 100%; height: 300px;"></div>
+        <div id="qrcode-scanner" class="dark" style="display: none;"></div>
 
         <div class='products-container'> 
             <table class="table table-dark text-center align-middle" id="productsTable" style="font-size: clamp(0.3em, 2vw, 1em);">
@@ -154,7 +154,7 @@
     </div>
 
 </div>
-
+<script src="{% static 'Shop/js/QRCode.js' %}"></script>
 <script>
     {% comment %} Formato de Moneda {% endcomment %}
         function formatCurrency(amount) {
@@ -229,70 +229,6 @@
                 }
             });
         });
-
-
-        let videoStream;
-
-        function startQRCodeScanner() {
-            const video = document.createElement("video");
-
-            navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" }
-            })
-            .then(stream => {
-                videoStream = stream;
-                video.srcObject = stream;
-                video.addEventListener("loadedmetadata", () => {
-                    video.play();
-                    requestAnimationFrame(() => scanQRCode(video));
-                });
-                // Agrega el video al contenedor permanente de "barcode-scanner"
-                document.getElementById("qrcode-scanner").appendChild(video);
-                document.getElementById("qrcode-scanner").style.display = "block"; // Muestra el contenedor
-            })
-            .catch(error => {
-                console.error("Error al acceder a la cámara:", error);
-            });
-        }
-        function scanQRCode(video) {
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-
-            // Configurar el tamaño del canvas igual al video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Dibujar el video en el canvas y obtener la imagen en cada cuadro
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-            // Decodificar la imagen con jsQR
-            const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-            if (qrCode) {
-                Swal.fire(`Código QR detectado: ${qrCode.data}`);
-                stopScanner(); // Detener el escáner una vez detectado el código
-            } else {
-                requestAnimationFrame(() => scanQRCode(video)); // Seguir escaneando
-            }
-        }
-
-        function stopScanner() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-        }
-    // Llamada al abrir la ventana de SweetAlert2
-    function openScanner() {
-        Swal.fire({
-            title: 'Escanea el código QR',
-            html: document.getElementById("qrcode-scanner"),
-            showCancelButton: true,
-            focusConfirm: false,
-            didOpen: () => startQRCodeScanner(),
-            willClose: () => stopScanner() // Detener el escáner al cerrar SweetAlert
-        });
-    }
 
 
         const discountEvent = function(){
