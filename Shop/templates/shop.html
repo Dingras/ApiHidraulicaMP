@@ -1,4 +1,5 @@
 {% extends 'index.html' %}
+{% load static %}
 
 {% block content %}
     <div class="d-flex justify-content-end align-items-center py-2">
@@ -96,6 +97,11 @@
                     <span class="input-group-text">Buscar</span>
                 </div>
                 <input type="text" aria-label="Productos" id="searchInput" class="form-control">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-dark" type="button" onclick=openScanner()>
+                        <i class="bi bi-upc-scan"> Leer </i><i class="bi bi-qr-code-scan"></i>
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -221,6 +227,67 @@
                 }
             });
         });
+
+
+        let videoStream;
+
+        function startQRCodeScanner() {
+            const video = document.createElement("video");
+
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" }
+            })
+            .then(stream => {
+                videoStream = stream;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                video.play();
+                requestAnimationFrame(() => scanQRCode(video));
+            })
+            .catch(error => {
+                console.error("Error al acceder a la cámara:", error);
+            });
+        }
+        function scanQRCode(video) {
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+
+            // Configurar el tamaño del canvas igual al video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Dibujar el video en el canvas y obtener la imagen en cada cuadro
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Decodificar la imagen con jsQR
+            const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+            if (qrCode) {
+                Swal.fire(`Código QR detectado: ${qrCode.data}`);
+                stopScanner(); // Detener el escáner una vez detectado el código
+            } else {
+                requestAnimationFrame(() => scanQRCode(video)); // Seguir escaneando
+            }
+        }
+
+        function stopScanner() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+        }
+    // Llamada al abrir la ventana de SweetAlert2
+    function openScanner() {
+        Swal.fire({
+            title: 'Escanea el código QR',
+            html: `<div id="barcode-scanner" style="width: 100%; height: 300px;"></div>`,
+            showCancelButton: true,
+            focusConfirm: false,
+            didOpen: () => startQRCodeScanner(),
+            willClose: () => stopScanner() // Detener el escáner al cerrar SweetAlert
+        });
+    }
+
 
         const discountEvent = function(){
             const rows = document.querySelectorAll('#cart tr');
