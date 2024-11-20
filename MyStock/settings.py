@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-x*^q_n%e7ltv!)b-sdronzh9c$&7aq*pq=%-@#uf^*ozc%&q57
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api-hidraulica-mp.vercel.app','api.hidraulicamp.com.ar','api-hidraulica-mp-git-test-act-7f8235-churritodeflores-projects.vercel.app','127.0.0.1']
+ALLOWED_HOSTS = ['api-hidraulica-mp.vercel.app','api.hidraulicamp.com.ar','127.0.0.1']
 
 
 # Application definition
