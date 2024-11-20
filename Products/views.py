@@ -2,13 +2,26 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from Products.forms import FormCategory, FormProduct
 from Products.models import Category, Product
+import qrcode
+import base64
+from io import BytesIO
 
 ## Products
 
 @login_required(login_url='/')
 def product_detail(request, id):
     data_product = get_object_or_404(Product, pk=id)
-    return render(request, 'product_detail.html', {'product' : data_product})
+    data = f"{id}"
+    
+    # Crear el QR
+    qr = qrcode.make(data)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+    return render(request, 'product_detail.html', {'product' : data_product , 'qr_code': qr_base64})
 
 @login_required(login_url='/')
 def products_view(request, id):
