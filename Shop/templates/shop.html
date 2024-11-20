@@ -1,5 +1,4 @@
 {% extends 'index.html' %}
-{% load static %}
 
 {% block content %}
     <div class="d-flex justify-content-end align-items-center py-2">
@@ -105,7 +104,7 @@
             </div>
         </div>
         
-        <div id="qrcode-scanner" class="dark" style="display: none;"></div>
+        <div id="qrcode-scanner" class="my-2 bg-dark d-flex justify-content-center" style="display: none;"></div>
 
         <div class='products-container'> 
             <table class="table table-dark text-center align-middle" id="productsTable" style="font-size: clamp(0.3em, 2vw, 1em);">
@@ -154,7 +153,7 @@
     </div>
 
 </div>
-<script src="{% static 'Shop/js/QRCode.js' %}"></script>
+
 <script>
     {% comment %} Formato de Moneda {% endcomment %}
         function formatCurrency(amount) {
@@ -201,24 +200,28 @@
         });
         
     {% comment %} Evento Botones de Alerta {% endcomment %}
+        async function ShowDataProduct(idProduct) {
+            const response = await fetch(`https://api.hidraulicamp.com.ar/api/products/${idProduct}`);
+            const product = await response.json();
+                    
+            Swal.fire({
+                title: `${product.name}`,
+                imageUrl: `${product.url_img}`,
+                imageHeight: 200,
+                imageAlt: `${product.name}`,
+                html: `
+                    <p>${formatCurrency(product.price)}</p>
+                    <p>${product.description}</p>
+                `,
+                confirmButtonText: 'OK'
+            });
+        }
+
         alertButtons.forEach(button => {
             button.addEventListener('click', async function () {
                 const idProduct = this.getAttribute('id-product');
                 try {
-                    const response = await fetch(`https://api.hidraulicamp.com.ar/api/products/${idProduct}`);
-                    const product = await response.json();
-                    
-                    Swal.fire({
-                        title: `${product.name}`,
-                        imageUrl: `${product.url_img}`,
-                        imageHeight: 200,
-                        imageAlt: `${product.name}`,
-                        html: `
-                            <p>${formatCurrency(product.price)}</p>
-                            <p>${product.description}</p>
-                        `,
-                        confirmButtonText: 'OK'
-                    });
+                    ShowDataProduct(idProduct)
                 } catch (error) {
                     Swal.fire({
                         title: 'Error',
@@ -259,6 +262,97 @@
                 }
             });
         });
+
+    let videoStream;
+    let qrScannerElement = document.getElementById("qrcode-scanner");
+
+    function startQRCodeScanner() {
+        const video = document.createElement("video");
+
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment", 
+                width: { ideal: 200 },   // Resolución ideal
+                height: { ideal: 300 },  // Resolución ideal
+            }
+        })
+        .then(stream => {
+            videoStream = stream;
+            video.srcObject = stream;
+
+            // Esperamos a que los metadatos del video se carguen (tamaño y demás)
+            video.addEventListener("loadedmetadata", () => {
+                video.play();
+                qrScannerElement.appendChild(video);
+                // Iniciamos la detección de QR usando el video
+                requestAnimationFrame(() => scanQRCode(video));
+            });
+            
+        })
+        .catch(error => {
+            console.error("Error al acceder a la cámara:", error);
+            alert("No se pudo acceder a la cámara. Verifica los permisos.");
+        });
+    }
+
+    function scanQRCode(video) {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        // Asegúrate de que las dimensiones del canvas coincidan con las del video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Dibujamos el video en el canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Usamos jsQR para intentar leer el QR
+        const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+        if (qrCode) {
+            //alert(`Código QR detectado: ${qrCode.data}`);
+
+            ShowDataProduct(qrCode.data)
+            // HACER UNA LOGICA PARA VER EL PRODUCTO O AÑADIR AL CARRITO.
+
+
+            stopScanner(); // Detenemos el escáner una vez detectado el código
+        } else {
+            // Continuamos el escaneo de manera recursiva
+            requestAnimationFrame(() => scanQRCode(video));
+        }
+    }
+
+    function stopScanner() {
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+        // Ocultamos el contenedor del escáner
+        
+        qrScannerElement.style.display = "none";
+        // Limpiamos el contenido del contenedor
+        qrScannerElement.innerHTML = '';
+    }
+
+    // Función para abrir el escáner
+    function openScanner() {    
+        // Hacemos visible el contenedor del escáner
+        console.log("Abriendo Escáner QR");
+        qrScannerElement.style.display = "block";
+        // Iniciamos el escáner cuando se muestra el contenedor
+        startQRCodeScanner();
+    }
+
+    // Función para cerrar el escáner manualmente
+    function closeScanner() {
+        stopScanner();
+    }
+
+    // Asociamos el evento de apertura del escáner con un botón
+    document.getElementById("scanner-btn").addEventListener("click", openScanner);
+
+
 </script>
 
 {% endblock %}
