@@ -272,8 +272,8 @@
         navigator.mediaDevices.getUserMedia({
             video: {
                 facingMode: "environment", 
-                width: { ideal: 200 },   // Resolución ideal
-                height: { ideal: 300 },  // Resolución ideal
+                width: { max: 600 }, 
+                aspectRatio: { ideal: 16 / 9 },
             }
         })
         .then(stream => {
@@ -335,13 +335,19 @@
         qrScannerElement.innerHTML = '';
     }
 
+    let scanActivateControl = false;
     // Función para abrir el escáner
-    function openScanner() {    
-        // Hacemos visible el contenedor del escáner
-        console.log("Abriendo Escáner QR");
-        qrScannerElement.style.display = "block";
-        // Iniciamos el escáner cuando se muestra el contenedor
-        startQRCodeScanner();
+    function openScanner() {  
+        scanActivateControl = !scanActivateControl;
+
+        if (!scanActivateControl) {
+            console.log("Cerrando Escáner QR: Estado =", scanActivateControl);
+            closeScanner();
+        } else {
+            console.log("Abriendo Escáner QR: Estado =", scanActivateControl);
+            qrScannerElement.style.display = "block";
+            startQRCodeScanner();
+    }
     }
 
     // Función para cerrar el escáner manualmente
